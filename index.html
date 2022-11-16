@@ -25,52 +25,104 @@
       </table>
     </main>
     <script>
-      let url1 = 'https://api.upbit.com/v1/market/all';
-      let url2 = 'https://api.upbit.com/v1/ticker?markets=KRW-BTC%2CKRW-ETH';
+      //   let krw;
+      //   let url1 = 'https://api.upbit.com/v1/market/all';
+      //   let url2 =
+      //     'https://api.upbit.com/v1/ticker?markets=KRW-BTC%2CKRW-ETH%2CKRW-XRP';
 
-      let coinList = axios.get(url1);
-      let coinPrice = axios.get(url2);
+      //   let coinList = axios.get(url1);
+      //   let coinPrice = axios.get(url2);
+      //   setTimeout(function () {
+      //     location.reload();
+      //   }, 60000);
+      //   Promise.all([coinList, coinPrice])
+      //     .then((response) => {
+      //       for (let i = 0; i < response[1].data.length; i++) {
+      //         if (response[1].data[i].market.indexOf('KRW') > -1) {
+      //           krw = '';
+      //           let koreanName = [];
+
+      //           krw += response[0].data[i].market + ',';
+      //           koreanName.push(
+      //             response[0].data[i].korean_name.replace('코인', '')
+      //           );
+      //           krw = krw.substring(0, krw.length - 1);
+      //           console.log(koreanName);
+      //           console.log(krw);
+      //           let price = response[1].data[i].trade_price;
+      //           let tradePrice = price
+      //             .toString()
+      //             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      //           console.log(tradePrice);
+      //           let volume = response[1].data[i].acc_trade_volume_24h;
+      //           let tradeVolume24 = volume
+      //             .toString()
+      //             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      //           let acc = response[1].data[i].acc_trade_price_24h;
+      //           let accTradePrice24 = acc
+      //             .toString()
+      //             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      //           const template = document
+      //             .getElementById('body-container')
+      //             .insertAdjacentHTML(
+      //               'beforebegin',
+      //               `  <tr>
+      //                      <td>${response[0].data[i].korean_name}</td>
+      //                      <td>${tradePrice}</td>
+      //                     <td>${tradeVolume24}</td>
+      //                     <td>${accTradePrice24}</td>
+      //                  </tr>`
+      //             );
+      //         }
+      //       }
+      //     })
+      //     .catch((err) => {
+      //       console.log(err);
+      //     });
+
       setTimeout(function () {
         location.reload();
       }, 60000);
-      Promise.all([coinList, coinPrice])
+
+      axios
+        .get('https://api.upbit.com/v1/market/all')
         .then((response) => {
-          for (let i = 0; i < response[1].data.length; i++) {
-            if (response[0].data[i].market.indexOf('KRW') > -1) {
-              let krw = '';
+          for (let i = 0; i < response.data.length; i++) {
+            if (response.data[i].market.indexOf('KRW') > -1) {
+              krw = '';
               let koreanName = [];
 
-              krw += response[0].data[i].market + ',';
-              //   koreanName.push(
-              //     response[0].data[i].korean_name.replace('코인', '')
-              //   );
+              krw += response.data[i].market + ',';
+              koreanName.push(response.data[i].korean_name.replace('코인', ''));
               krw = krw.substring(0, krw.length - 1);
-              console.log(koreanName);
-              console.log(krw);
-              let price = response[1].data[i].trade_price;
-              let tradePrice = price
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-              console.log(tradePrice);
-              let volume = response[1].data[i].acc_trade_volume_24h;
-              let tradeVolume24 = volume
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-              let acc = response[1].data[i].acc_trade_price_24h;
-              let accTradePrice24 = acc
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-              const template = document
-                .getElementById('body-container')
-                .insertAdjacentHTML(
-                  'beforebegin',
-                  `  <tr>
-                         <td>${response[0].data[i].korean_name}</td>
-                         <td>${tradePrice}</td>
-                        <td>${tradeVolume24}</td>
-                        <td>${accTradePrice24}</td>
-                     </tr>`
-                );
+              axios
+                .get('https://api.upbit.com/v1/ticker?markets=' + krw)
+                .then((res) => {
+                  let price = res.data[0].trade_price;
+                  let tradePrice = price
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                  let volume = res.data[0].acc_trade_volume_24h;
+                  let tradeVolume24 = volume
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                  let acc = res.data[0].acc_trade_price_24h;
+                  let accTradePrice24 = acc
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                  const template = document
+                    .getElementById('body-container')
+                    .insertAdjacentHTML(
+                      'beforebegin',
+                      `  <tr>
+                           <td>${response.data[i].korean_name}</td>
+                           <td>${tradePrice}</td>
+                          <td>${tradeVolume24}</td>
+                          <td>${accTradePrice24}</td>
+                       </tr>`
+                    );
+                });
             }
           }
         })
